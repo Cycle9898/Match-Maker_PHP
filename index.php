@@ -1,46 +1,51 @@
 <?php
-
-const RESULT_WINNER = 1;
-const RESULT_LOSER = -1;
-const RESULT_DRAW = 0;
-const RESULT_POSSIBILITIES = [RESULT_WINNER, RESULT_LOSER, RESULT_DRAW];
-
 class Encounter
 {
-    public function getProbabilityAgainst(int $levelPlayerOne, int $againstLevelPlayerTwo): float
+    public const RESULT_WINNER = 1;
+    public const RESULT_LOSER = -1;
+    public const RESULT_DRAW = 0;
+    private const RESULT_POSSIBILITIES = [self::RESULT_WINNER, self::RESULT_LOSER, self::RESULT_DRAW];
+
+    public static function getProbabilityAgainst(Player $playerOne, Player $playerTwo): float
     {
-        return 1 / (1 + (10 ** (($againstLevelPlayerTwo - $levelPlayerOne) / 400)));
+        return 1 / (1 + (10 ** (($playerTwo->level - $playerOne->level) / 400)));
     }
 
-    public function setNewLevel(int &$levelPlayerOne, int $againstLevelPlayerTwo, int $playerOneResult)
+    public static function setNewLevel(Player &$playerOne, Player $playerTwo, int $playerOneResult)
     {
-        if (!in_array($playerOneResult, RESULT_POSSIBILITIES)) {
-            trigger_error(sprintf('Invalid result. Expected %s', implode(' or ', RESULT_POSSIBILITIES)));
+        if (!in_array($playerOneResult, self::RESULT_POSSIBILITIES)) {
+            trigger_error(sprintf('Invalid result. Expected %s', implode(' or ', self::RESULT_POSSIBILITIES)));
         }
 
-        $levelPlayerOne += (int) (32 * ($playerOneResult - $this->getProbabilityAgainst($levelPlayerOne, $againstLevelPlayerTwo)));
+        $playerOne->level += (int) (32 * ($playerOneResult - self::getProbabilityAgainst($playerOne, $playerTwo)));
     }
 }
 
-$greg = 400;
-$jade = 800;
+class Player
+{
+    public int $level;
+}
 
-echo "Niveau initial Greg: $greg<br/>";
-echo "Niveau initial Jade: $jade<br/>";
+$greg = new Player();
+$jade = new Player();
 
-$encounter = new Encounter;
+$greg->level = 400;
+$jade->level = 800;
+
+echo "Niveau initial Greg: $greg->level<br/>";
+echo "Niveau initial Jade: $jade->level<br/>";
 
 echo sprintf(
-    'Greg à %.2f%% chance de gagner face à Jade.<br/>',
-    $encounter->getProbabilityAgainst($greg, $jade) * 100
+    'Greg à %.2f %% chance de gagner face à Jade.<br/>',
+    Encounter::getProbabilityAgainst($greg, $jade) * 100
 ) . PHP_EOL;
 
 // If Greg wins
 echo 'Greg a gagné !<br/>';
-$encounter->setNewLevel($greg, $jade, RESULT_WINNER);
-$encounter->setNewLevel($jade, $greg, RESULT_LOSER);
+Encounter::setNewLevel($greg, $jade, Encounter::RESULT_WINNER);
+Encounter::setNewLevel($jade, $greg, Encounter::RESULT_LOSER);
 
-echo "Niveau actualisé Greg: $greg<br/>";
-echo "Niveau actualisé Jade: $jade<br/>";
+echo "Niveau actualisé Greg: $greg->level<br/>";
+echo "Niveau actualisé Jade: $jade->level<br/>";
 
 exit(0);
