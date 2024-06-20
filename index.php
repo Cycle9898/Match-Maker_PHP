@@ -8,7 +8,7 @@ class Encounter
 
     public static function getProbabilityAgainst(Player $playerOne, Player $playerTwo): float
     {
-        return 1 / (1 + (10 ** (($playerTwo->level - $playerOne->level) / 400)));
+        return 1 / (1 + (10 ** (($playerTwo->getLevel() - $playerOne->getLevel()) / 400)));
     }
 
     public static function setNewLevel(Player &$playerOne, Player $playerTwo, int $playerOneResult)
@@ -17,23 +17,38 @@ class Encounter
             trigger_error(sprintf('Invalid result. Expected %s', implode(' or ', self::RESULT_POSSIBILITIES)));
         }
 
-        $playerOne->level += (int) (32 * ($playerOneResult - self::getProbabilityAgainst($playerOne, $playerTwo)));
+        $playerOne->setLevel(
+            $playerOne->getLevel() +
+                round(32 * ($playerOneResult - self::getProbabilityAgainst($playerOne, $playerTwo)))
+        );
     }
 }
 
 class Player
 {
-    public int $level;
+    private int $level;
+
+    public function __construct(int $level)
+    {
+        $this->level = $level;
+    }
+
+    public function getLevel(): int
+    {
+        return $this->level;
+    }
+
+    public function setLevel(int $level): void
+    {
+        $this->level = $level;
+    }
 }
 
-$greg = new Player();
-$jade = new Player();
+$greg = new Player(400);
+$jade = new Player(800);
 
-$greg->level = 400;
-$jade->level = 800;
-
-echo "Niveau initial Greg: $greg->level<br/>";
-echo "Niveau initial Jade: $jade->level<br/>";
+echo "Niveau initial Greg: {$greg->getLevel()}<br/>";
+echo "Niveau initial Jade: {$jade->getLevel()}<br/>";
 
 echo sprintf(
     'Greg à %.2f %% chance de gagner face à Jade.<br/>',
@@ -45,7 +60,7 @@ echo 'Greg a gagné !<br/>';
 Encounter::setNewLevel($greg, $jade, Encounter::RESULT_WINNER);
 Encounter::setNewLevel($jade, $greg, Encounter::RESULT_LOSER);
 
-echo "Niveau actualisé Greg: $greg->level<br/>";
-echo "Niveau actualisé Jade: $jade->level<br/>";
+echo "Niveau actualisé Greg: {$greg->getLevel()}<br/>";
+echo "Niveau actualisé Jade: {$jade->getLevel()}<br/>";
 
 exit(0);
