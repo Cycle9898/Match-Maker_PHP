@@ -92,6 +92,25 @@ class QueuingPlayer extends Player
     }
 }
 
+class BlitzPlayer extends Player
+{
+    public function __construct(public string $name, public float $ratio = 1200.0)
+    {
+        parent::__construct($name, $ratio);
+    }
+
+    public function updateRatioAgainst(BasePlayer $player, int $result): void
+    {
+        // ranking is 4 times faster (128 instead of 32)
+        $this->ratio += 128 * ($result - $this->probabilityAgainst($player));
+    }
+}
+
+$blitzPlayer1 = new BlitzPlayer(('John'));
+$blitzPlayer2 = new BlitzPlayer(('Jane'));
+
+echo var_dump([$blitzPlayer1, $blitzPlayer2]) . "<br />";
+
 $player1 = new Player('José', 400);
 $player2 = new Player('Jade', 450);
 
