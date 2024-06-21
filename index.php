@@ -31,17 +31,28 @@ class Lobby
     }
 }
 
-class Player
+abstract class BasePlayer
 {
     protected string $name;
-    protected float $ratio = 400.0;
+    protected float $ratio;
 
-    public function __construct(string $name, float $ratio)
+    public function __construct(string $name, float $ratio = 400.0)
     {
         $this->name = $name;
         $this->ratio = $ratio;
     }
 
+    abstract public function getName(): string;
+
+    abstract public function getRatio(): float;
+
+    abstract protected function probabilityAgainst(self $player): float;
+
+    abstract public function updateRatioAgainst(self $player, int $result): void;
+}
+
+class Player extends BasePlayer
+{
     public function getName(): string
     {
         return $this->name;
@@ -52,12 +63,12 @@ class Player
         return round($this->ratio, 2);
     }
 
-    private function probabilityAgainst(self $player): float
+    protected function probabilityAgainst(BasePlayer $player): float
     {
         return 1 / (1 + (10 ** (($player->getRatio() - $this->getRatio()) / 400)));
     }
 
-    public function updateRatioAgainst(self $player, int $result): void
+    public function updateRatioAgainst(BasePlayer $player, int $result): void
     {
         $this->ratio += 32 * ($result - $this->probabilityAgainst($player));
     }
@@ -65,7 +76,7 @@ class Player
 
 class QueuingPlayer extends Player
 {
-    public function __construct(PLayer $pLayer, protected int $range = 1)
+    public function __construct(BasePlayer $pLayer, protected int $range = 1)
     {
         parent::__construct($pLayer->getName(), $pLayer->getRatio());
     }
