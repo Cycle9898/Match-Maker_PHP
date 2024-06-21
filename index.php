@@ -1,4 +1,10 @@
 <?php
+
+namespace App\MathMaker;
+
+use App\MathMaker\Player\Player;
+use App\MathMaker\Player\QueuingPlayer;
+
 class Lobby
 {
     /**
@@ -30,6 +36,8 @@ class Lobby
         }
     }
 }
+
+namespace App\MathMaker\Player;
 
 abstract class BasePlayer
 {
@@ -106,10 +114,10 @@ class BlitzPlayer extends Player
     }
 }
 
-$blitzPlayer1 = new BlitzPlayer(('John'));
-$blitzPlayer2 = new BlitzPlayer(('Jane'));
+namespace App;
 
-echo var_dump([$blitzPlayer1, $blitzPlayer2]) . "<br />";
+use App\MathMaker\Player\Player;
+use App\MathMaker\Lobby;
 
 $player1 = new Player('José', 400);
 $player2 = new Player('Jade', 450);
@@ -117,13 +125,14 @@ $player2 = new Player('Jade', 450);
 $lobby = new Lobby();
 $lobby->addPlayers($player1, $player2);
 
-// test findOpponents method, should find player2
+// Test findOpponents method, should find player2
 echo var_dump($lobby->findOpponents($lobby->queuingPlayers[0])) . "<br />";
 
+// Test display
 echo "Niveau initial {$player1->getName()}: {$player1->getRatio()}<br/>";
 echo "Niveau initial {$player2->getName()}: {$player2->getRatio()}<br/>";
 
-// If player1 wins
+// if player1 wins
 echo "{$player1->getName()} a gagné !<br/>";
 $player1->updateRatioAgainst($player2, 1);
 $player2->updateRatioAgainst($player1, -1);
