@@ -1,5 +1,7 @@
 # Match-Maker_PHP
 
-Application web qui crée des rencontres compétitives basées sur le niveau des joueurs
+Début d'application web qui aura pour but de créer des rencontres compétitives basées sur le niveau des joueurs.
 
-===> TBC
+## Objectif
+
+Pratique de la programmation orientée objets (POO) en PHP.
