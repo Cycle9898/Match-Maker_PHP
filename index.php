@@ -1,123 +1,13 @@
 <?php
 
-namespace App\MathMaker;
+spl_autoload_register(function (string $fQCN): void {
+    $path = str_replace(["App", "\\"], ["src", "/"], $fQCN) . ".php";
 
-use App\MathMaker\Player\Player;
-use App\MathMaker\Player\QueuingPlayer;
+    require_once($path);
+});
 
-class Lobby
-{
-    /**
-     * @var array<QueuingPLayer>
-     */
-    public array $queuingPlayers = [];
-
-    public function findOpponents(QueuingPlayer $player): array
-    {
-        $minLevel = round($player->getRatio() / 100);
-        $maxLevel = $minLevel + $player->getRange();
-
-        return array_filter($this->queuingPlayers, static function (QueuingPlayer $potentialOpponent) use ($minLevel, $maxLevel, $player) {
-            $playerLevel = round($potentialOpponent->getRatio() / 100);
-
-            return $player !== $potentialOpponent && ($minLevel <= $playerLevel) && ($playerLevel <= $maxLevel);
-        });
-    }
-
-    public function addPlayer(Player $player): void
-    {
-        $this->queuingPlayers[] = new QueuingPlayer($player);
-    }
-
-    public function addPlayers(Player ...$players): void
-    {
-        foreach ($players as $player) {
-            $this->addPlayer($player);
-        }
-    }
-}
-
-namespace App\MathMaker\Player;
-
-abstract class BasePlayer
-{
-    protected string $name;
-    protected float $ratio;
-
-    public function __construct(string $name, float $ratio = 400.0)
-    {
-        $this->name = $name;
-        $this->ratio = $ratio;
-    }
-
-    abstract public function getName(): string;
-
-    abstract public function getRatio(): float;
-
-    abstract protected function probabilityAgainst(self $player): float;
-
-    abstract public function updateRatioAgainst(self $player, int $result): void;
-}
-
-class Player extends BasePlayer
-{
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getRatio(): float
-    {
-        return round($this->ratio, 2);
-    }
-
-    protected function probabilityAgainst(BasePlayer $player): float
-    {
-        return 1 / (1 + (10 ** (($player->getRatio() - $this->getRatio()) / 400)));
-    }
-
-    public function updateRatioAgainst(BasePlayer $player, int $result): void
-    {
-        $this->ratio += 32 * ($result - $this->probabilityAgainst($player));
-    }
-}
-
-class QueuingPlayer extends Player
-{
-    public function __construct(BasePlayer $pLayer, protected int $range = 1)
-    {
-        parent::__construct($pLayer->getName(), $pLayer->getRatio());
-    }
-
-    public function getRange(): int
-    {
-        return $this->range;
-    }
-
-    public function upgradeRange(): void
-    {
-        $this->range = min($this->range + 1, 40);
-    }
-}
-
-class BlitzPlayer extends Player
-{
-    public function __construct(public string $name, public float $ratio = 1200.0)
-    {
-        parent::__construct($name, $ratio);
-    }
-
-    public function updateRatioAgainst(BasePlayer $player, int $result): void
-    {
-        // ranking is 4 times faster (128 instead of 32)
-        $this->ratio += 128 * ($result - $this->probabilityAgainst($player));
-    }
-}
-
-namespace App;
-
-use App\MathMaker\Player\Player;
-use App\MathMaker\Lobby;
+use App\MatchMaker\Player\Player;
+use App\MatchMaker\Lobby;
 
 $player1 = new Player('José', 400);
 $player2 = new Player('Jade', 450);
