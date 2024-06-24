@@ -14,12 +14,12 @@ class Player extends BasePlayer
         return round($this->ratio, 2);
     }
 
-    protected function probabilityAgainst(BasePlayer $player): float
+    protected function probabilityAgainst(PlayerInterface $player): float
     {
         return 1 / (1 + (10 ** (($player->getRatio() - $this->getRatio()) / 400)));
     }
 
-    public function updateRatioAgainst(BasePlayer $player, int $result): void
+    public function updateRatioAgainst(PlayerInterface $player, int $result): void
     {
         $this->ratio += 32 * ($result - $this->probabilityAgainst($player));
     }

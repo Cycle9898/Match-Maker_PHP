@@ -2,7 +2,7 @@
 
 namespace App\MatchMaker\Player;
 
-abstract class BasePlayer
+abstract class BasePlayer implements PlayerInterface
 {
     protected string $name;
     protected float $ratio;
@@ -17,7 +17,7 @@ abstract class BasePlayer
 
     abstract public function getRatio(): float;
 
-    abstract protected function probabilityAgainst(self $player): float;
+    abstract protected function probabilityAgainst(PlayerInterface $player): float;
 
-    abstract public function updateRatioAgainst(self $player, int $result): void;
+    abstract public function updateRatioAgainst(PlayerInterface $player, int $result): void;
 }

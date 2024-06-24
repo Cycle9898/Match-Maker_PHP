@@ -4,7 +4,7 @@ namespace App\MatchMaker\Player;
 
 class QueuingPlayer extends Player
 {
-    public function __construct(BasePlayer $pLayer, protected int $range = 1)
+    public function __construct(PlayerInterface $pLayer, protected int $range = 1)
     {
         parent::__construct($pLayer->getName(), $pLayer->getRatio());
     }
